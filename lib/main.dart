@@ -22,7 +22,8 @@ class App extends StatelessWidget {
       },
       title: 'Kino Locations',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        canvasColor: Colors.cyan,
+        primaryColor: Colors.deepPurple,
       ),
     );
   }
@@ -41,7 +42,7 @@ class HomePage extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Authorisation',
+            tooltip: 'Авторизация',
             onPressed: () {
               Navigator.push(
                 context,
@@ -80,6 +81,7 @@ class HomePage extends StatelessWidget {
                   );
                   PageController pageController = PageController();
                   return Card(
+                    color: Colors.cyan,
                     child: Container(
                       padding: EdgeInsets.all(32),
                       height: 480,
@@ -116,7 +118,7 @@ class HomePage extends StatelessWidget {
                                   return PhotoViewGallery.builder(
                                     pageController: pageController,
                                     backgroundDecoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Colors.cyan,
                                     ),
                                     itemCount: images.length,
                                     builder: (context, img) {

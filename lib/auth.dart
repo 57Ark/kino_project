@@ -113,6 +113,7 @@ class Auth extends StatelessWidget {
           onSubmitAnimationCompleted: () {
             Navigator.pop(context);
           },
+          title: 'Вход и регистрация',
           onLogin: _authUser,
           onSignup: _regUser,
           onRecoverPassword: _recoverPassword,
