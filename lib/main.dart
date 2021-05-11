@@ -3,43 +3,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'auth.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize FlutterFire:
+  await Firebase.initializeApp();
   runApp(App());
 }
 
 class App extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(),
+      },
+      title: 'Kino Locations',
       theme: ThemeData(
-        primarySwatch: Colors.cyan,
-      ),
-      home: FutureBuilder(
-        // Initialize FlutterFire:
-        future: _initialization,
-        builder: (context, snapshot) {
-          // Check for errors
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "ERROR",
-              ),
-            );
-          }
-
-          // Once complete, show your application
-          if (snapshot.connectionState == ConnectionState.done) {
-            return HomePage();
-          }
-
-          // Otherwise, show something whilst waiting for initialization to complete
-          return Center(child: CircularProgressIndicator());
-        },
+        primarySwatch: Colors.deepPurple,
       ),
     );
   }
@@ -48,13 +31,25 @@ class App extends StatelessWidget {
 class HomePage extends StatelessWidget {
   final FirebaseStorage storage = FirebaseStorage.instance;
   final CollectionReference locations =
-      FirebaseFirestore.instance.collection('locations');
+      FirebaseFirestore.instance.collection('kino-locations');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Demo"),
+        title: Text("Kino Locations"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Authorisation',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Auth()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: FutureBuilder(
@@ -62,6 +57,7 @@ class HomePage extends StatelessWidget {
               locations.doc('counter').get().then((value) => value['count']),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.hasError) {
+              print(snapshot.error);
               return Text(
                 "ERROR",
               );
@@ -106,6 +102,7 @@ class HomePage extends StatelessWidget {
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
                                 if (snapshot.hasError) {
+                                  print(snapshot.error);
                                   return Center(
                                     child: Text(
                                       "ERROR",
