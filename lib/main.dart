@@ -68,6 +68,17 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: 'Фильтры',
+            );
+          },
+        ),
       ),
       drawer: MyDrawer(this.setState, widget.filterSettings),
       body: Center(
@@ -202,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Center(
                                         child: Text(
-                                          '${loc['rooms']} комнат$roomsEnding общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/месяц',
+                                          '${loc['rooms']} комнат$roomsEnding общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/сутки',
                                           textScaleFactor: 1.5,
                                         ),
                                       ),
