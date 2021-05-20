@@ -103,7 +103,7 @@ class Auth extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Authorisation',
+            tooltip: 'Личный кабинет',
             onPressed: () {},
           ),
         ],

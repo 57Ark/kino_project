@@ -3,7 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
+import 'my_drawer.dart';
+import 'add_location.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +32,17 @@ class App extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  final FilterSettings filterSettings = FilterSettings();
   final FirebaseStorage storage = FirebaseStorage.instance;
   final CollectionReference locations =
       FirebaseFirestore.instance.collection('kino-locations');
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,20 +51,31 @@ class HomePage extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Авторизация',
+            tooltip: 'Личный кабинет',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Auth()),
-              );
+              User? user = widget.auth.currentUser;
+              if (user != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddLocation()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Auth()),
+                );
+              }
             },
           ),
         ],
       ),
+      drawer: MyDrawer(this.setState, widget.filterSettings),
       body: Center(
         child: FutureBuilder(
-          future:
-              locations.doc('counter').get().then((value) => value['count']),
+          future: widget.locations
+              .doc('counter')
+              .get()
+              .then((value) => value['count']),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.hasError) {
               print(snapshot.error);
@@ -69,149 +89,148 @@ class HomePage extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 itemCount: snapshot.data,
                 itemBuilder: (context, i) {
-                  Future<List<String>> imageURLs =
-                      storage.ref("/$i").list().then(
-                    (imageRefs) async {
-                      List<String> rtrn = [];
-                      for (final ref in imageRefs.items) {
-                        rtrn.add(await ref.getDownloadURL());
+                  return FutureBuilder(
+                    future: widget.locations.doc(i.toString()).get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error);
+                        return Center(
+                          child: Text(
+                            "ERROR",
+                          ),
+                        );
                       }
-                      return rtrn;
-                    },
-                  );
-                  PageController pageController = PageController();
-                  return Card(
-                    color: Colors.cyan,
-                    child: Container(
-                      padding: EdgeInsets.all(32),
-                      height: 480,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            iconSize: 50,
-                            icon: Icon(
-                              Icons.keyboard_arrow_left_outlined,
-                            ),
-                            onPressed: () => pageController.previousPage(
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.ease,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 640,
-                            child: FutureBuilder(
-                              future: imageURLs,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<dynamic> snapshot) {
-                                if (snapshot.hasError) {
-                                  print(snapshot.error);
-                                  return Center(
-                                    child: Text(
-                                      "ERROR",
-                                    ),
-                                  );
-                                }
 
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  List<String> images = snapshot.data;
-                                  return PhotoViewGallery.builder(
-                                    pageController: pageController,
-                                    backgroundDecoration: BoxDecoration(
-                                      color: Colors.cyan,
-                                    ),
-                                    itemCount: images.length,
-                                    builder: (context, img) {
-                                      return PhotoViewGalleryPageOptions(
-                                        imageProvider:
-                                            NetworkImage(images[img]),
-                                      );
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        Map<String, dynamic> loc = snapshot.data.data();
+                        if (widget.filterSettings.filter(loc)) {
+                          Future<List<String>> imageURLs =
+                              widget.storage.ref("/$i").list().then(
+                            (imageRefs) async {
+                              List<String> rtrn = [];
+                              for (final ref in imageRefs.items) {
+                                rtrn.add(await ref.getDownloadURL());
+                              }
+                              return rtrn;
+                            },
+                          );
+                          PageController pageController = PageController();
+                          String roomsEnding = 'а';
+                          if ((11 <= loc['rooms'] && loc['rooms'] <= 14) ||
+                              loc['rooms'] % 10 == 0 ||
+                              loc['rooms'] % 10 >= 5) {
+                            roomsEnding = '';
+                          } else if (loc['rooms'] % 10 != 1) {
+                            roomsEnding = 'ы';
+                          }
+                          return Container(
+                            padding: EdgeInsets.all(32),
+                            height: 480,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  iconSize: 50,
+                                  icon: Icon(
+                                    Icons.keyboard_arrow_left_outlined,
+                                  ),
+                                  onPressed: () => pageController.previousPage(
+                                    duration: Duration(milliseconds: 500),
+                                    curve: Curves.ease,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 640,
+                                  child: FutureBuilder(
+                                    future: imageURLs,
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<dynamic> snapshot) {
+                                      if (snapshot.hasError) {
+                                        print(snapshot.error);
+                                        return Center(
+                                          child: Text(
+                                            "ERROR",
+                                          ),
+                                        );
+                                      }
+
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        List<String> images = snapshot.data;
+                                        return PhotoViewGallery.builder(
+                                          pageController: pageController,
+                                          backgroundDecoration: BoxDecoration(
+                                            color: Colors.cyan,
+                                          ),
+                                          itemCount: images.length,
+                                          builder: (context, img) {
+                                            return PhotoViewGalleryPageOptions(
+                                              imageProvider:
+                                                  NetworkImage(images[img]),
+                                            );
+                                          },
+                                        );
+                                      }
+
+                                      return Center(
+                                          child: CircularProgressIndicator());
                                     },
-                                  );
-                                }
-
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              },
-                            ),
-                          ),
-                          IconButton(
-                            iconSize: 50,
-                            icon: Icon(
-                              Icons.keyboard_arrow_right_outlined,
-                            ),
-                            onPressed: () => pageController.nextPage(
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.ease,
-                            ),
-                          ),
-                          Expanded(
-                            child: FutureBuilder(
-                              future: locations.doc(i.toString()).get(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<dynamic> snapshot) {
-                                if (snapshot.hasError) {
-                                  return Center(
-                                    child: Text(
-                                      "ERROR",
-                                    ),
-                                  );
-                                }
-
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  Map<String, dynamic> locs =
-                                      snapshot.data.data();
-                                  String roomsEnding = 'а';
-                                  if ((11 <= locs['rooms'] &&
-                                          locs['rooms'] <= 14) ||
-                                      locs['rooms'] % 10 == 0 ||
-                                      locs['rooms'] % 10 >= 5) {
-                                    roomsEnding = '';
-                                  } else if (locs['rooms'] % 10 != 1) {
-                                    roomsEnding = 'ы';
-                                  }
-                                  return Stack(children: [
-                                    Align(
-                                      alignment: Alignment.topCenter,
-                                      child: Text(
-                                        locs['title'],
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                IconButton(
+                                  iconSize: 50,
+                                  icon: Icon(
+                                    Icons.keyboard_arrow_right_outlined,
+                                  ),
+                                  onPressed: () => pageController.nextPage(
+                                    duration: Duration(milliseconds: 500),
+                                    curve: Curves.ease,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topCenter,
+                                        child: Text(
+                                          loc['title'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textScaleFactor: 2,
                                         ),
-                                        textScaleFactor: 2,
                                       ),
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        '${locs['rooms']} комнат$roomsEnding общей площадью ${locs['square']} м\u00B2 за ${locs['price']} \u20BD/месяц',
-                                        textScaleFactor: 1.5,
+                                      Center(
+                                        child: Text(
+                                          '${loc['rooms']} комнат$roomsEnding общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/месяц',
+                                          textScaleFactor: 1.5,
+                                        ),
                                       ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Text(
-                                        locs['address'] +
-                                            ', этаж ${locs['floor']}/${locs['overall floor']}',
-                                        textScaleFactor: 1.5,
+                                      Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Text(
+                                          loc['address'] +
+                                              ', этаж ${loc['floor']}/${loc['overall floor']}',
+                                          textScaleFactor: 1.5,
+                                        ),
                                       ),
-                                    ),
-                                  ]);
-                                }
-
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              },
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }
+                      return Container();
+                    },
                   );
                 },
               );
             }
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           },
         ),
       ),
