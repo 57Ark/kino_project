@@ -1,6 +1,8 @@
 # kino_project
 
-A new Flutter project.
+Основной код на Flutter лежит в папке /lib
+
+Сайт находится в папаке /build/web
 
 ## Getting Started
 
