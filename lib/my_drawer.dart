@@ -22,18 +22,18 @@ class _MyDrawerState extends State<MyDrawer> {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.cyan,
+                color: Colors.black,
               ),
               child: Text(
                 'Фильтры',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 24,
                 ),
               ),
             ),
             Card(
-              color: Colors.cyan,
+              color: Colors.white,
               child: Column(
                 children: [
                   Align(
@@ -111,7 +111,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
             ),
             Card(
-              color: Colors.cyan,
+              color: Colors.white,
               child: Column(children: [
                 Align(
                   alignment: Alignment.centerLeft,
@@ -157,7 +157,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ]),
             ),
             Card(
-              color: Colors.cyan,
+              color: Colors.white,
               child: Column(children: [
                 Align(
                   alignment: Alignment.centerLeft,

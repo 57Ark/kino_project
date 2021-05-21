@@ -25,7 +25,7 @@ class App extends StatelessWidget {
       },
       title: 'Kino Locations',
       theme: ThemeData(
-        canvasColor: Colors.cyan,
+        canvasColor: Colors.white,
         primaryColor: Colors.deepPurple,
       ),
     );
@@ -153,102 +153,118 @@ class _HomePageState extends State<HomePage> {
                           if (loc['rooms'] != 0)
                             room = '${loc['rooms']} комнат' + roomsEnding;
 
-                          return Container(
-                            padding: EdgeInsets.all(32),
-                            height: 480,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  iconSize: 50,
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_left_outlined,
+                          return Card(
+                            child: Container(
+                              padding: EdgeInsets.all(32),
+                              height:
+                                  3 * MediaQuery.of(context).size.height / 5,
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    flex: 1,
+                                    child: IconButton(
+                                      // iconSize: 50,
+                                      icon: Icon(
+                                        Icons.keyboard_arrow_left_outlined,
+                                      ),
+                                      onPressed: () =>
+                                          pageController.previousPage(
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.ease,
+                                      ),
+                                    ),
                                   ),
-                                  onPressed: () => pageController.previousPage(
-                                    duration: Duration(milliseconds: 500),
-                                    curve: Curves.ease,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 640,
-                                  child: FutureBuilder(
-                                    future: imageURLs,
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<dynamic> snapshot) {
-                                      if (snapshot.hasError) {
-                                        print(snapshot.error);
-                                        return Center(
-                                          child: Text(
-                                            "ERROR",
-                                          ),
-                                        );
-                                      }
-
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.done) {
-                                        List<String> images = snapshot.data;
-                                        return PhotoViewGallery.builder(
-                                          pageController: pageController,
-                                          backgroundDecoration: BoxDecoration(
-                                            color: Colors.cyan,
-                                          ),
-                                          itemCount: images.length,
-                                          builder: (context, img) {
-                                            return PhotoViewGalleryPageOptions(
-                                              imageProvider:
-                                                  NetworkImage(images[img]),
+                                  Flexible(
+                                    flex: 24,
+                                    child: AspectRatio(
+                                      aspectRatio: 3 / 2,
+                                      child: FutureBuilder(
+                                        future: imageURLs,
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<dynamic> snapshot) {
+                                          if (snapshot.hasError) {
+                                            print(snapshot.error);
+                                            return Center(
+                                              child: Text(
+                                                "ERROR",
+                                              ),
                                             );
-                                          },
-                                        );
-                                      }
+                                          }
 
-                                      return Center(
-                                          child: CircularProgressIndicator());
-                                    },
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.done) {
+                                            List<String> images = snapshot.data;
+                                            return PhotoViewGallery.builder(
+                                              pageController: pageController,
+                                              backgroundDecoration:
+                                                  BoxDecoration(
+                                                color: Colors.white,
+                                              ),
+                                              itemCount: images.length,
+                                              builder: (context, img) {
+                                                return PhotoViewGalleryPageOptions(
+                                                  imageProvider:
+                                                      NetworkImage(images[img]),
+                                                );
+                                              },
+                                            );
+                                          }
+
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        },
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  iconSize: 50,
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_right_outlined,
+                                  Flexible(
+                                    flex: 1,
+                                    child: IconButton(
+                                      // iconSize: 50,
+                                      icon: Icon(
+                                        Icons.keyboard_arrow_right_outlined,
+                                      ),
+                                      onPressed: () => pageController.nextPage(
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.ease,
+                                      ),
+                                    ),
                                   ),
-                                  onPressed: () => pageController.nextPage(
-                                    duration: Duration(milliseconds: 500),
-                                    curve: Curves.ease,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Stack(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Text(
-                                          loc['title'],
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                  Flexible(
+                                    flex: 30,
+                                    child: Stack(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Text(
+                                            loc['title'],
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textScaleFactor: 2,
                                           ),
-                                          textScaleFactor: 2,
                                         ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                          '$room общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/сутки',
-                                          textScaleFactor: 1.5,
+                                        Center(
+                                          child: Text(
+                                            '$room общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/сутки',
+                                            textScaleFactor: 1.5,
+                                          ),
                                         ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Text(
-                                          loc['address'] +
-                                              floor +
-                                              '\n' +
-                                              contact,
-                                          textScaleFactor: 1.5,
+                                        Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Text(
+                                            loc['address'] +
+                                                floor +
+                                                '\n' +
+                                                contact,
+                                            textScaleFactor: 1.5,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           );
                         } else {

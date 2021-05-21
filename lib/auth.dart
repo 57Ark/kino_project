@@ -106,16 +106,17 @@ class Auth extends StatelessWidget {
           onSubmitAnimationCompleted: () {
             Navigator.pop(context);
           },
-          title: 'Вход и регистрация',
+          title: 'Авторизация',
           onLogin: _authUser,
           onSignup: _regUser,
           onRecoverPassword: _recoverPassword,
           theme: LoginTheme(
-            primaryColor: Colors.cyan,
+            cardTheme: CardTheme(color: Colors.lightBlue.shade300),
+            primaryColor: Colors.white,
             accentColor: Colors.deepPurple,
             buttonTheme: LoginButtonTheme(
               backgroundColor: Colors.deepPurple,
-              splashColor: Colors.cyan,
+              splashColor: Colors.deepPurple,
               highlightColor: Colors.deepPurple,
             ),
           ),

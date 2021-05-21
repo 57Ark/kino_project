@@ -7,6 +7,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
+import 'payment.dart';
 
 class AddLocation extends StatefulWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -42,7 +43,6 @@ class _AddLocationState extends State<AddLocation> {
             tooltip: 'Выход из аккаунта',
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -90,7 +90,10 @@ class _AddLocationState extends State<AddLocation> {
                 (cnt) => widget.locations
                     .doc("counter")
                     .set({"count": cnt + 1})
-                    .then((_) => Navigator.pop(context))
+                    .then((_) => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Payment()),
+                        ))
                     .catchError(
                       (error) => print("Failed to add user: $error"),
                     ),
@@ -99,7 +102,7 @@ class _AddLocationState extends State<AddLocation> {
           }
         },
         child: const Icon(Icons.add),
-        backgroundColor: Colors.cyan,
+        backgroundColor: Colors.deepPurple,
       ),
       body: Center(
         child: Card(
@@ -285,8 +288,8 @@ class _AddLocationState extends State<AddLocation> {
                   child: Row(children: [
                     ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.cyan)),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.deepPurple)),
                       onPressed: () async {
                         PickedFile? newImage = await imagePicker.getImage(
                             source: ImageSource.gallery);
@@ -319,7 +322,10 @@ class _AddLocationState extends State<AddLocation> {
                           }
                         }
                       },
-                      child: const Text('Загрузить фото'),
+                      child: const Text(
+                        'Загрузить фото',
+                        // style: TextStyle(color: Colors.deepPurple),
+                      ),
                     ),
                     Visibility(
                       visible: images.length > 0,
