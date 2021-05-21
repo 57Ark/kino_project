@@ -100,13 +100,6 @@ class Auth extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Kino Locations"),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'Личный кабинет',
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Center(
         child: FlutterLogin(

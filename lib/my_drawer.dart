@@ -103,7 +103,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       widget.updateParent(() {});
                     },
                     title: Text(
-                      '4 или более комнат',
+                      '4 комнаты или более',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
@@ -171,18 +171,18 @@ class _MyDrawerState extends State<MyDrawer> {
                   onChanged: (RangeValues? newValues) {
                     setState(() {
                       if (newValues != null) {
-                        if (newValues.end - newValues.start > 10) {
+                        if (newValues.end - newValues.start > 5000) {
                           widget.filterSettings.price = newValues;
                         } else {
                           if (widget.filterSettings.price.start ==
                               newValues.start) {
                             widget.filterSettings.price = RangeValues(
                                 widget.filterSettings.price.start,
-                                widget.filterSettings.price.start + 10);
+                                widget.filterSettings.price.start + 5000);
                           } else if (widget.filterSettings.price.end ==
                               newValues.end) {
                             widget.filterSettings.price = RangeValues(
-                                widget.filterSettings.price.end - 10,
+                                widget.filterSettings.price.end - 5000,
                                 widget.filterSettings.price.end);
                           }
                         }

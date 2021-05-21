@@ -126,6 +126,19 @@ class _HomePageState extends State<HomePage> {
                               return rtrn;
                             },
                           );
+                          String floor = '';
+                          if (loc['floor'] != 0 && loc['overall floor'] != 0)
+                            floor =
+                                ', этаж ${loc['floor']}/${loc['overall floor']}';
+                          else if (loc['floor'] != 0)
+                            floor = ', этаж ${loc['floor']}';
+
+                          String contact = '';
+                          if (loc['name'] != '' && loc['name'] != null)
+                            contact = loc['name'] + ' - ';
+                          if (loc['contact'] != '' && loc['contact'] != null)
+                            contact += loc['contact'];
+
                           PageController pageController = PageController();
                           String roomsEnding = 'а';
                           if ((11 <= loc['rooms'] && loc['rooms'] <= 14) ||
@@ -135,6 +148,11 @@ class _HomePageState extends State<HomePage> {
                           } else if (loc['rooms'] % 10 != 1) {
                             roomsEnding = 'ы';
                           }
+
+                          String room = '';
+                          if (loc['rooms'] != 0)
+                            room = '${loc['rooms']} комнат' + roomsEnding;
+
                           return Container(
                             padding: EdgeInsets.all(32),
                             height: 480,
@@ -213,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Center(
                                         child: Text(
-                                          '${loc['rooms']} комнат$roomsEnding общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/сутки',
+                                          '$room общей площадью ${loc['square']} м\u00B2 за ${loc['price']} \u20BD/сутки',
                                           textScaleFactor: 1.5,
                                         ),
                                       ),
@@ -221,7 +239,9 @@ class _HomePageState extends State<HomePage> {
                                         alignment: Alignment.bottomCenter,
                                         child: Text(
                                           loc['address'] +
-                                              ', этаж ${loc['floor']}/${loc['overall floor']}',
+                                              floor +
+                                              '\n' +
+                                              contact,
                                           textScaleFactor: 1.5,
                                         ),
                                       ),

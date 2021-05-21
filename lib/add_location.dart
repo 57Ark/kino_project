@@ -5,12 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth.dart';
 
 class AddLocation extends StatefulWidget {
+  final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseStorage storage = FirebaseStorage.instance;
   final CollectionReference locations =
       FirebaseFirestore.instance.collection('kino-locations');
-
   @override
   _AddLocationState createState() => _AddLocationState();
 }
@@ -22,6 +24,11 @@ class _AddLocationState extends State<AddLocation> {
   List<Map<String, dynamic>> images = [];
   PageController pageController = PageController();
 
+  bool isNumeric(String? s) {
+    if (s == null) return false;
+    return double.tryParse(s) != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Future<int> counter =
@@ -31,14 +38,24 @@ class _AddLocationState extends State<AddLocation> {
         title: Text("Kino Locations"),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'Личный кабинет',
-            onPressed: () {},
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: 'Выход из аккаунта',
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Auth()),
+              );
+            },
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          User? user = widget.auth.currentUser;
+          if (user != null) loc['contact'] = user.email;
           if (_formKey.currentState!.validate()) {
             if (images.length == 0) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -92,129 +109,128 @@ class _AddLocationState extends State<AddLocation> {
               children: [
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'Name',
+                    icon: Icon(Icons.textsms),
+                    hintText: 'Как ваше объявление будет называться?',
+                    labelText: 'Название',
                   ),
                   onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
+                    loc['title'] = value;
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    return null;
                   },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
                     icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'Address',
+                    hintText: 'Как вас зовут?',
+                    labelText: 'Имя',
+                  ),
+                  onSaved: (String? value) {
+                    loc['name'] = value;
+                  },
+                  validator: (String? value) {
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.attach_money),
+                    hintText: 'Укажите цену за сутки в рублях',
+                    labelText: 'Цена',
+                  ),
+                  onSaved: (String? value) {
+                    if (value != null) loc['price'] = int.parse(value);
+                  },
+                  validator: (String? value) {
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    if (!isNumeric(value)) return 'Пожалуйста, введите число';
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.pin_drop),
+                    hintText: 'Введите адрес вашей локации',
+                    labelText: 'Адрес',
                   ),
                   onSaved: (String? value) {
                     loc['address'] = value;
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    return null;
                   },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'floor',
+                    icon: Icon(Icons.network_cell),
+                    hintText: 'На каком этаже находится локация?',
+                    labelText: 'Этаж',
                   ),
                   onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
+                    if (value != null) loc['floor'] = int.parse(value);
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    if (!isNumeric(value))
+                      return 'Пожалуйста, введите положительное число';
+                    return null;
                   },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'Overallfloor',
+                    icon: Icon(Icons.network_locked),
+                    hintText: 'Сколько всего этажей в здании?',
+                    labelText: 'Всего этажей',
                   ),
                   onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
+                    if (value != null) loc['overall floor'] = int.parse(value);
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    if (!isNumeric(value)) return 'Пожалуйста, введите число';
+                    return null;
                   },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'price',
+                    icon: Icon(Icons.grid_on),
+                    hintText: 'Укажите количество комнат в локации',
+                    labelText: 'Количество комнат',
                   ),
                   onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
+                    if (value != null) loc['rooms'] = int.parse(value);
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    if (!isNumeric(value)) return 'Пожалуйста, введите число';
+                    return null;
                   },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'rooms',
+                    icon: Icon(Icons.tab_unselected),
+                    hintText: 'Введите площадь локации в м\u00B2',
+                    labelText: 'Площадь',
                   ),
                   onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
+                    if (value != null) loc['square'] = int.parse(value);
                   },
                   validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
-                  },
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: ' Square',
-                  ),
-                  onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
-                  },
-                  validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
-                  },
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'What do people call you?',
-                    labelText: 'title',
-                  ),
-                  onSaved: (String? value) {
-                    // This optional block of code can be used to run
-                    // code when the user saves the form.
-                  },
-                  validator: (String? value) {
-                    return (value != null && value.contains('@'))
-                        ? 'Do not use the @ char.'
-                        : null;
+                    if (value == '' || value == null)
+                      return 'Пожалуйтса, заполните это поле';
+                    if (!isNumeric(value)) return 'Пожалуйста, введите число';
+                    return null;
                   },
                 ),
                 Visibility(
