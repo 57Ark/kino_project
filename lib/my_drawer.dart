@@ -39,7 +39,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '   Количесвто комнат',
+                      '   Количество комнат',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
