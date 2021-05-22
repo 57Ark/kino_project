@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kino_project/main.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'add_location.dart';
@@ -54,9 +55,12 @@ class _ProfileState extends State<Profile> {
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
-              icon: Icon(Icons.menu),
+              icon: Icon(Icons.arrow_back),
               onPressed: () {
-                Scaffold.of(context).openDrawer();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
               },
               tooltip: 'Фильтры',
             );
