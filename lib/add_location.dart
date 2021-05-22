@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
 import 'payment.dart';
+import 'profile.dart';
 
 class AddLocation extends StatefulWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -39,15 +40,21 @@ class _AddLocationState extends State<AddLocation> {
         title: Text("Kino Locations"),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            tooltip: 'Выход из аккаунта',
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Auth()),
-              );
+            icon: const Icon(Icons.person),
+            tooltip: 'Личный кабинет',
+            onPressed: () {
+              User? user = widget.auth.currentUser;
+              if (user != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Profile()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Auth()),
+                );
+              }
             },
           ),
         ],

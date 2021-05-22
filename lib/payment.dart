@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kino_project/main.dart';
-import 'add_location.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'profile.dart';
+import 'auth.dart';
 
 class Payment extends StatefulWidget {
+  final FirebaseAuth auth = FirebaseAuth.instance;
   @override
   _PaymentState createState() => _PaymentState();
 }
@@ -36,10 +39,18 @@ class _PaymentState extends State<Payment> {
             icon: const Icon(Icons.person),
             tooltip: 'Личный кабинет',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddLocation()),
-              );
+              User? user = widget.auth.currentUser;
+              if (user != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Profile()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Auth()),
+                );
+              }
             },
           ),
         ],

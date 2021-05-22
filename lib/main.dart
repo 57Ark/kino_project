@@ -6,7 +6,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
 import 'my_drawer.dart';
-import 'add_location.dart';
+import 'profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
               if (user != null) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddLocation()),
+                  MaterialPageRoute(builder: (context) => Profile()),
                 );
               } else {
                 Navigator.push(
