@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'auth.dart';
 import 'my_drawer.dart';
 import 'profile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
@@ -43,6 +45,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String _url = '';
+  void _launchURL() async => await canLaunch(_url)
+      ? await launch(_url)
+      : throw 'Could not launch $_url';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,11 +141,13 @@ class _HomePageState extends State<HomePage> {
                             floor = ', этаж ${loc['floor']}';
 
                           String contact = '';
-                          if (loc['name'] != '' && loc['name'] != null)
-                            contact = loc['name'] + ' - ';
-                          if (loc['contact'] != '' && loc['contact'] != null)
-                            contact += loc['contact'];
 
+                          if (loc['contact'] != '' && loc['contact'] != null)
+                            contact = loc['contact'];
+                          if (loc['name'] != '' && loc['name'] != null)
+                            contact = loc['name'] + ' - ' + contact;
+                          else
+                            _url = contact;
                           PageController pageController = PageController();
                           String roomsEnding = 'а';
                           if ((11 <= loc['rooms'] && loc['rooms'] <= 14) ||
@@ -236,12 +245,22 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Align(
                                           alignment: Alignment.topCenter,
-                                          child: Text(
-                                            loc['title'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textScaleFactor: 2,
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                loc['title'],
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textScaleFactor: 2,
+                                              ),
+                                              TextButton(
+                                                  onPressed: _launchURL,
+                                                  child: Text(
+                                                    contact,
+                                                    textScaleFactor: 1.5,
+                                                  ))
+                                            ],
                                           ),
                                         ),
                                         Center(
@@ -253,10 +272,7 @@ class _HomePageState extends State<HomePage> {
                                         Align(
                                           alignment: Alignment.bottomCenter,
                                           child: Text(
-                                            loc['address'] +
-                                                floor +
-                                                '\n' +
-                                                contact,
+                                            loc['address'] + floor,
                                             textScaleFactor: 1.5,
                                           ),
                                         ),

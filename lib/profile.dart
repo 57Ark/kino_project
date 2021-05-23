@@ -147,6 +147,7 @@ class _ProfileState extends State<Profile> {
                                       ConnectionState.done) {
                                     Map<String, dynamic> loc =
                                         snapshot.data.data();
+
                                     if (loc['contact'] != null &&
                                         loc['contact'] != '' &&
                                         loc['contact'] == _email) {
@@ -319,9 +320,7 @@ class _ProfileState extends State<Profile> {
                                       return Container();
                                     }
                                   }
-                                  return Container(
-                                    child: Text('Тут пока ничего нет'),
-                                  );
+                                  return Container();
                                 },
                               );
                             },
