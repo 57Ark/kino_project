@@ -1,7 +1,9 @@
 # kino_project
 
 Основной код на Flutter лежит в папке /lib
+
 Сайт находится в папаке /build/web
+
 Дополнительные материалы для kino_project лежат в папке kino_project_materials:
   Scrappers - папка со всеми скраперами 
   CSV files - папка со всеми данными, собранными скраперами
