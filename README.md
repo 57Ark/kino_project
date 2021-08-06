@@ -4,9 +4,9 @@
 Сайт находится в папаке /build/web
 
 Дополнительные материалы для kino_project лежат в папке kino_project_materials:  
- Scrappers - папка со всеми скраперами  
- CSV files - папка со всеми данными, собранными скраперами  
- firbase_upload.py - скрипт для загрузки данных в Firebase  
+ - Scrappers - папка со всеми скраперами  
+ - CSV files - папка со всеми данными, собранными скраперами  
+ - firbase_upload.py - скрипт для загрузки данных в Firebase  
 
 ## Getting Started
 
